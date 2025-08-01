@@ -33,4 +33,5 @@ import { TodoUI } from "./dom";
 
 // Initialize
 const store = new TodoStore();
-new TodoUI(store);
+const ui = new TodoUI(store);
+ui.renderTodos();

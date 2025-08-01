@@ -1,4 +1,4 @@
-import type { Todo, FilterStatus } from "./types";
+import type { FilterStatus } from "./types";
 import TodoStore from "./store";
 
 export class TodoUI {
@@ -42,7 +42,7 @@ export class TodoUI {
     });
   }
 
-  private renderTodos(filter: FilterStatus = "all"): void {
+  renderTodos(filter: FilterStatus = "all"): void {
     const todos = this.store.getTodos(filter);
 
     this.list.innerHTML = todos
@@ -51,7 +51,8 @@ export class TodoUI {
         <li class="${todo.completed ? "completed" : ""}" data-id="${todo.id}">
           <input type="checkbox" ${todo.completed ? "checked" : ""}>
           <span>${todo.title}</span>
-          <button class="delete">×</button>
+          <button class="delete">❌</button>
+          <button class="edit">✏️</button>
         </li>
       `,
       )
@@ -77,6 +78,23 @@ export class TodoUI {
           const id = Number(li.dataset.id);
           this.store.deleteTodo(id);
           this.renderTodos(filter); // Re-render with the same filter
+        }
+      });
+    });
+
+    this.list.querySelectorAll(".edit").forEach((button) => {
+      button.addEventListener("click", () => {
+        const li = button.closest("li");
+        if (li) {
+          const id = Number(li.dataset.id);
+          const newTitle = prompt(
+            "Edit todo title:",
+            li.querySelector("span")?.textContent || "",
+          );
+          if (newTitle !== null && newTitle.trim() !== "") {
+            this.store.editTodo(id, newTitle.trim());
+            this.renderTodos(filter); // Re-render with the same filter
+          }
         }
       });
     });
