@@ -53,11 +53,23 @@ export default class TodoStore {
   }
 
   private saveToLocalStorage(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todos));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todos));
+    } catch (error) {
+      console.error("Failed to save todos to localStorage:", error);
+      // Retry logic or notification to the user can be added here
+    }
   }
 
   private loadFromLocalStorage(): Todo[] {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error("Failed to load todos from localStorage:", error);
+      return [];
+    }
   }
 }
