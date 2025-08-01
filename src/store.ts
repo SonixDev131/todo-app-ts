@@ -1,13 +1,15 @@
 import type { Todo, FilterStatus } from "./types";
+import { GenericStorage } from "./generic-storage";
 
 // Key for localStorage
 const STORAGE_KEY = "todos";
+const todoStorage = new GenericStorage<Todo[]>(STORAGE_KEY);
 
 export default class TodoStore {
   private todos: Todo[] = [];
 
   constructor() {
-    this.todos = this.loadFromLocalStorage();
+    this.todos = todoStorage.load() || [];
   }
 
   addTodo(title: string): void {
@@ -17,27 +19,27 @@ export default class TodoStore {
       completed: false,
     };
     this.todos.push(newTodo);
-    this.saveToLocalStorage();
+    todoStorage.save(this.todos);
   }
 
   toggleTodo(id: number): void {
     const todo = this.todos.find((todo) => todo.id === id);
     if (todo) {
       todo.completed = !todo.completed;
-      this.saveToLocalStorage();
+      todoStorage.save(this.todos);
     }
   }
 
   deleteTodo(id: number): void {
     this.todos = this.todos.filter((todo) => todo.id !== id);
-    this.saveToLocalStorage();
+    todoStorage.save(this.todos);
   }
 
   editTodo(id: number, newTitle: string): void {
     const todo = this.todos.find((todo) => todo.id === id);
     if (todo) {
       todo.title = newTitle;
-      this.saveToLocalStorage();
+      todoStorage.save(this.todos);
     }
   }
 
@@ -49,27 +51,6 @@ export default class TodoStore {
         return this.todos.filter((todo) => todo.completed);
       default:
         return this.todos;
-    }
-  }
-
-  private saveToLocalStorage(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todos));
-    } catch (error) {
-      console.error("Failed to save todos to localStorage:", error);
-      // Retry logic or notification to the user can be added here
-    }
-  }
-
-  private loadFromLocalStorage(): Todo[] {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) return [];
-      const parsed = JSON.parse(data);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      console.error("Failed to load todos from localStorage:", error);
-      return [];
     }
   }
 }
