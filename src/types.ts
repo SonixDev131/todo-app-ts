@@ -1,5 +1,5 @@
 export interface Todo {
-  id: number;
+  id: string; // Changed to string for UUID
   title: string;
   completed: boolean;
   dueDate?: string; // Optional due date

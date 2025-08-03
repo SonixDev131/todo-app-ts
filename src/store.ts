@@ -1,56 +1,50 @@
 import type { Todo, FilterStatus } from "./types";
-import { GenericStorage } from "./generic-storage";
+import { Repository } from "./repository";
 
 // Key for localStorage
 const STORAGE_KEY = "todos";
-const todoStorage = new GenericStorage<Todo[]>(STORAGE_KEY);
 
 export default class TodoStore {
-  private todos: Todo[] = [];
+  private todoRepository: Repository<Todo>;
 
   constructor() {
-    this.todos = todoStorage.load() || [];
+    this.todoRepository = new Repository<Todo>(STORAGE_KEY);
   }
 
-  addTodo(title: string): void {
-    const newTodo: Todo = {
-      id: this.todos.length + 1, // Simple ID generation
+  addTodo(title: string): Todo {
+    return this.todoRepository.add({
       title,
       completed: false,
-    };
-    this.todos.push(newTodo);
-    todoStorage.save(this.todos);
+    });
   }
 
-  toggleTodo(id: number): void {
-    const todo = this.todos.find((todo) => todo.id === id);
-    if (todo) {
-      todo.completed = !todo.completed;
-      todoStorage.save(this.todos);
-    }
+  toggleTodo(id: string): Todo | undefined {
+    const todo = this.todoRepository.findById(id);
+    if (!todo) return undefined;
+
+    return this.todoRepository.update(id, {
+      completed: !todo.completed,
+    });
   }
 
-  deleteTodo(id: number): void {
-    this.todos = this.todos.filter((todo) => todo.id !== id);
-    todoStorage.save(this.todos);
+  deleteTodo(id: string): boolean {
+    return this.todoRepository.delete(id);
   }
 
-  editTodo(id: number, newTitle: string): void {
-    const todo = this.todos.find((todo) => todo.id === id);
-    if (todo) {
-      todo.title = newTitle;
-      todoStorage.save(this.todos);
-    }
+  editTodo(id: string, newTitle: string): Todo | undefined {
+    return this.todoRepository.update(id, {
+      title: newTitle,
+    });
   }
 
   getTodos(status: FilterStatus = "all"): Todo[] {
     switch (status) {
       case "pending":
-        return this.todos.filter((todo) => !todo.completed);
+        return this.todoRepository.filter("completed", false);
       case "completed":
-        return this.todos.filter((todo) => todo.completed);
+        return this.todoRepository.filter("completed", true);
       default:
-        return this.todos;
+        return this.todoRepository.getAll();
     }
   }
 }

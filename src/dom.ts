@@ -63,7 +63,7 @@ export class TodoUI {
       checkbox.addEventListener("change", () => {
         const li = checkbox.closest("li");
         if (li) {
-          const id = Number(li.dataset.id);
+          const id = String(li.dataset.id);
           this.store.toggleTodo(id);
           this.renderTodos(filter); // Re-render with the same filter
         }
@@ -75,7 +75,7 @@ export class TodoUI {
       button.addEventListener("click", () => {
         const li = button.closest("li");
         if (li) {
-          const id = Number(li.dataset.id);
+          const id = String(li.dataset.id);
           this.store.deleteTodo(id);
           this.renderTodos(filter); // Re-render with the same filter
         }
@@ -86,7 +86,7 @@ export class TodoUI {
       button.addEventListener("click", () => {
         const li = button.closest("li");
         if (li) {
-          const id = Number(li.dataset.id);
+          const id = String(li.dataset.id);
           const newTitle = prompt(
             "Edit todo title:",
             li.querySelector("span")?.textContent || "",
