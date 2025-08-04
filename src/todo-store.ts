@@ -26,7 +26,7 @@ export default class TodoStore {
   // Public method to subscribe to events
   on<K extends keyof TodoEvents>(
     event: K,
-    handler: (data: TodoEvents[K]) => void
+    handler: (data: TodoEvents[K]) => void,
   ): void {
     this.events.on(event, handler);
   }
@@ -34,7 +34,7 @@ export default class TodoStore {
   // Public method to unsubscribe from events
   off<K extends keyof TodoEvents>(
     event: K,
-    handler: (data: TodoEvents[K]) => void
+    handler: (data: TodoEvents[K]) => void,
   ): void {
     this.events.off(event, handler);
   }

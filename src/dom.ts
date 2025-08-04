@@ -1,8 +1,9 @@
 import type { FilterStatus } from "./types";
-import TodoStore from "./store";
+import TodoStore from "./todo-store";
 
 export class TodoUI {
   private store: TodoStore;
+  private currentFilter: FilterStatus = "all";
 
   private form: HTMLFormElement;
   private input: HTMLInputElement;
@@ -17,6 +18,28 @@ export class TodoUI {
     this.list = document.getElementById("todo-list") as HTMLUListElement;
 
     this.setupEvents();
+    this.setupStoreEvents(); // ← New: Listen to store events!
+    this.renderTodos(); // Initial render
+  }
+
+  // NEW: Listen to store events for reactive UI
+  private setupStoreEvents(): void {
+    // Auto-refresh UI when todos change
+    this.store.on("todo:added", () => {
+      this.renderTodos(this.currentFilter);
+    });
+
+    this.store.on("todo:updated", () => {
+      this.renderTodos(this.currentFilter);
+    });
+
+    this.store.on("todo:toggled", () => {
+      this.renderTodos(this.currentFilter);
+    });
+
+    this.store.on("todo:deleted", () => {
+      this.renderTodos(this.currentFilter);
+    });
   }
 
   private setupEvents(): void {
@@ -28,7 +51,7 @@ export class TodoUI {
       if (title) {
         this.store.addTodo(title);
         this.input.value = ""; // Clear input
-        this.renderTodos();
+        // No need to call renderTodos() - store event will handle it!
       }
     });
 
@@ -37,6 +60,7 @@ export class TodoUI {
       const button = (e.target as HTMLElement).closest("button");
       if (button) {
         const filter = button.dataset.filter as FilterStatus;
+        this.currentFilter = filter; // Track current filter
         this.renderTodos(filter);
       }
     });
@@ -54,7 +78,7 @@ export class TodoUI {
           <button class="delete">❌</button>
           <button class="edit">✏️</button>
         </li>
-      `,
+      `
       )
       .join("");
 
@@ -65,7 +89,7 @@ export class TodoUI {
         if (li) {
           const id = String(li.dataset.id);
           this.store.toggleTodo(id);
-          this.renderTodos(filter); // Re-render with the same filter
+          // No need to call renderTodos() - store event will handle it!
         }
       });
     });
@@ -77,7 +101,7 @@ export class TodoUI {
         if (li) {
           const id = String(li.dataset.id);
           this.store.deleteTodo(id);
-          this.renderTodos(filter); // Re-render with the same filter
+          // No need to call renderTodos() - store event will handle it!
         }
       });
     });
@@ -89,11 +113,11 @@ export class TodoUI {
           const id = String(li.dataset.id);
           const newTitle = prompt(
             "Edit todo title:",
-            li.querySelector("span")?.textContent || "",
+            li.querySelector("span")?.textContent || ""
           );
           if (newTitle !== null && newTitle.trim() !== "") {
             this.store.editTodo(id, newTitle.trim());
-            this.renderTodos(filter); // Re-render with the same filter
+            // No need to call renderTodos() - store event will handle it!
           }
         }
       });

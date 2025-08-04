@@ -28,7 +28,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   </div>
 `;
 
-import TodoStore from "./store";
+import TodoStore from "./todo-store";
 import { TodoUI } from "./dom";
 
 // Initialize
