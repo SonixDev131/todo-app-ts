@@ -19,7 +19,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* JSX Configuration for React */
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   },
   "include": ["src"]
 }
